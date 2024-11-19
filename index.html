@@ -130,15 +130,13 @@
     </style>
 </head>
 <body>
-
     <h1>File Scraper</h1>
-    <p>Enter the URL to scrape files (images, PDFs, scripts, etc.) from:</p>
-    <input type="url" id="urlInput" placeholder="https://example.com">
-    <button id="scrapeButton">Start Scraping</button>
-    <p id="status"></p>
+    <p>Enter the URL to scrape files (e.g., images, PDFs, etc.):</p>
+    <input type="url" id="urlInput" placeholder="https://example.com" aria-label="Enter the URL to scrape files" required>
+    <button id="scrapeButton" aria-label="Start scraping">Start Scraping</button>
+    <p id="status" role="status"></p>
     <div id="results"></div>
 
     <script src="script.js"></script>
-
 </body>
 </html>
