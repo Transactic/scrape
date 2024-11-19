@@ -3,42 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Scraper</title>
+    <title>File Scraper</title>
     <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
         }
-        input, button {
-            padding: 10px;
-            margin: 5px 0;
-            width: 100%;
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 2em;
         }
-        #results {
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background: #f9f9f9;
+
+        p {
+            font-size: 1.1em;
+            color: #555;
+            text-align: center;
+            margin-bottom: 15px;
         }
-        .download-button {
-            padding: 5px 10px;
+
+        /* Input and Button Styles */
+        input[type="url"] {
+            padding: 15px;
+            font-size: 1.1em;
+            width: 80%;
+            max-width: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="url"]:focus {
+            border-color: #4CAF50;
+        }
+
+        button {
             background-color: #4CAF50;
             color: white;
+            padding: 12px 20px;
+            font-size: 1.2em;
+            width: 80%;
+            max-width: 400px;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 5px;
+            transition: background-color 0.3s;
+            margin-bottom: 30px;
         }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Results Section */
+        #results {
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 300px;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-link {
+            color: #4CAF50;
+            font-size: 1.1em;
+            text-decoration: none;
+        }
+
+        .file-link:hover {
+            text-decoration: underline;
+        }
+
+        .download-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
         .download-button:hover {
             background-color: #45a049;
+        }
+
+        #status {
+            font-size: 1.1em;
+            color: #333;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Web Scraper</h1>
-    <p>Enter a website URL to start scraping:</p>
-    <input type="url" id="urlInput" placeholder="https://example.com" required>
+
+    <h1>File Scraper</h1>
+    <p>Enter the URL to scrape files (images, PDFs, etc.) from:</p>
+    <input type="url" id="urlInput" placeholder="https://example.com">
     <button id="scrapeButton">Start Scraping</button>
     <p id="status"></p>
     <div id="results"></div>
@@ -49,13 +144,17 @@
             const status = document.getElementById("status");
             const results = document.getElementById("results");
 
+            // Clear previous results
+            status.textContent = "";
+            results.innerHTML = "";
+
             if (!url.startsWith("http")) {
                 alert("Please enter a valid URL with 'http://' or 'https://'.");
                 return;
             }
 
             status.textContent = "Scraping started...";
-            results.innerHTML = "";
+            results.innerHTML = ""; // Reset previous results
 
             // Use fetch to get the content of the page
             fetch(url)
@@ -66,8 +165,8 @@
 
                     // Find all <a> tags with href attributes
                     const links = doc.querySelectorAll('a[href]');
-
                     const fileLinks = [];
+
                     links.forEach(link => {
                         const href = link.getAttribute('href');
                         if (href.match(/\.(jpg|jpeg|png|gif|pdf|mp3|zip)$/)) {
@@ -75,26 +174,31 @@
                         }
                     });
 
+                    // Display the results
                     if (fileLinks.length === 0) {
-                        status.textContent = "No files found.";
+                        status.textContent = "No downloadable files found.";
                     } else {
                         status.textContent = `Found ${fileLinks.length} files.`;
                         fileLinks.forEach(file => {
+                            const fileItem = document.createElement('div');
+                            fileItem.classList.add('file-item');
+
                             const fileLink = document.createElement('a');
                             fileLink.href = file;
                             fileLink.target = "_blank";
+                            fileLink.classList.add('file-link');
                             fileLink.textContent = file;
 
                             const downloadButton = document.createElement('button');
-                            downloadButton.classList.add("download-button");
+                            downloadButton.classList.add('download-button');
                             downloadButton.textContent = "Download";
                             downloadButton.onclick = function () {
                                 window.open(file, '_blank');
                             };
 
-                            results.appendChild(fileLink);
-                            results.appendChild(downloadButton);
-                            results.appendChild(document.createElement('br'));
+                            fileItem.appendChild(fileLink);
+                            fileItem.appendChild(downloadButton);
+                            results.appendChild(fileItem);
                         });
                     }
                 })
@@ -104,5 +208,6 @@
                 });
         });
     </script>
+
 </body>
 </html>
