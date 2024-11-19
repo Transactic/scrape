@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        #results {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Scraper</h1>
+    <p>Enter a website URL to start scraping:</p>
+    <input type="url" id="urlInput" placeholder="https://example.com" required>
+    <button id="scrapeButton">Start Scraping</button>
+    <p id="status"></p>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById("scrapeButton").addEventListener("click", function () {
+            const url = document.getElementById("urlInput").value;
+            const status = document.getElementById("status");
+            const results = document.getElementById("results");
+
+            if (!url.startsWith("http")) {
+                alert("Please enter a valid URL with 'http://' or 'https://'.");
+                return;
+            }
+
+            status.textContent = "Scraping started...";
+            results.innerHTML = "";
+
+            // Send a request to the backend (to handle scraping logic)
+            fetch("/scrape", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: url }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                status.textContent = "Scraping completed!";
+                results.innerHTML = `<strong>Total URLs scraped: ${data.total}</strong><br>` + 
+                                    data.links.map(link => `<a href="${link}" target="_blank">${link}</a>`).join("<br>");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                status.textContent = "Error occurred while scraping.";
+            });
+        });
+    </script>
+</body>
+</html>
